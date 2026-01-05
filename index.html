@@ -1,8 +1,38 @@
-<!Doctype html>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Horario Bus</title>
+</head>
 <body>
-  <h1>hola nundo</h1>
-  <label for="dia">Fecha</label>
-  <input type="date" id="dia">
-  <label for="hora">Hora</label>
-  <input type="time" id="hora">
+    <div id="ruta">
+        <div id="ciudad">
+        <input id="origen" type="text" value="San Fernando" readonly>
+        <button id="cambioRuta">⇄</button>
+        <input id="destino" type="text" value="Cádiz" readonly>
+        </div>
+        <div id="paradas">
+            <select id="selOrigen"></select>
+            <select id="selDestino"></select>
+        </div>
+    </div>
+    <div id="lineas">
+        <input id="checkM10" type="checkbox" value="2" checked>
+        <label for="checkM10">M-10</label>
+        <input id="checkM11" type="checkbox" value="3">
+        <label for="checkM11">M-11</label>
+    </div>
+    <div>
+        <label for="dia">Fecha: </label>
+        <input type="date" id="dia">
+        <label for="hora">Hora: </label>
+        <input type="time" id="hora">
+        <button id="actualizar">Actualizar</button>
+    </div>
+
+    <table id="tabla-resultados"></table>
+
+    <script src="script.js"></script>
 </body>
+</html>
