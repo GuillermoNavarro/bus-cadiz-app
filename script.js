@@ -27,8 +27,8 @@ function descargar(){
     const dia = parte[2];
     const mes = parte [1];
 
-    const urlM10 = 'http://api.ctan.es/v1/Consorcios/2/horarios_lineas?dia=' + dia + '&lang=ES&linea=2&mes=' + mes;
-    const urlM11 = 'http://api.ctan.es/v1/Consorcios/2/horarios_lineas?dia=' + dia + '&lang=ES&linea=3&mes=' + mes;
+    const urlM10 = 'https://corsproxy.io/?http://api.ctan.es/v1/Consorcios/2/horarios_lineas?dia=' + dia + '&lang=ES&linea=2&mes=' + mes;
+    const urlM11 = 'https://corsproxy.io/?http://api.ctan.es/v1/Consorcios/2/horarios_lineas?dia=' + dia + '&lang=ES&linea=3&mes=' + mes;
 
     Promise.all([
         fetch(urlM10).then(res => res.json()),
@@ -164,5 +164,6 @@ console.log(checkM11.checked);
 fchBusq.addEventListener("change", () => {
     descargar();
 });
+
 
 // http://api.ctan.es/v1/Consorcios/2/horarios_lineas?dia=21&lang=ES&linea=2&mes=12
