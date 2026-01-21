@@ -36,60 +36,100 @@ function descargar(){
     ])
 
     .then(datos => {
-        CACHE.m10 = Array.isArray(datos[0]);
-        CACHE.m11 = Array.isArray(datos[1]);
-        console.log(datos[0]);
-    })
+        CACHE.m10 = Array.isArray(datos[0]) ? datos[0][0] : datos[0];
+        CACHE.m11 = Array.isArray(datos[1]) ? datos[1][0] : datos[1]; 
+        console.log(CACHE.m10);
 
-    //selectParadas();
+        
+        consultarHorarios();
+    });
+
 }
 
-function selectParadas(){
+function selectParadas(datosJson, linea, origen, destino, listaGuardada){
+    const hospital = "Hospital-Segunda Ag.";
+    const plan = datosJson.planificadores[0];
+    let paradas;
+    let horarios;
 
+    
+    if(origen==="Cádiz"){
+        paradas = plan.bloquesIda;
+        horarios = plan.horarioIda;
+    }
+
+    if(origen==="San Fernando"){
+        paradas = plan.bloquesVuelta;
+        horarios = plan.horarioVuelta;
+    }
+
+    let indexS = 0;
+    let indexF = paradas.findIndex(p => p.nombre === "Frecuencia")-1;
+    let indexI = paradas.findIndex(p => p.nombre === "Hospital-Segunda Ag.");
+
+    const hFiltro = horaBusq.value;
+
+    
+    horarios.forEach(viaje => {
+        const hSalida = viaje.horas[indexS];
+        const hHosp = viaje.horas[indexI];
+        const hLLegada = viaje.horas[indexF];
+        const frecuencia = viaje.frecuencia;
+
+        if(hSalida > hFiltro){
+        
+        listaGuardada.push({
+            linea: linea,
+            salida: hSalida,
+            hospital: hHosp,
+            llegada: hLLegada,
+            frecuencia: frecuencia  
+        });
+    }
+    });
 }
 
 function consultarHorarios(){
+   
+    const tabla = document.getElementById("tabla-resultados");
+    tabla.innerHTML="";
     
+    let verM10 = checkM10.checked;
+    let verM11 = checkM11.checked; 
+    let origen = rutaOrigen.value;
+    let destino= rutaDestino.value;
 
+    let viajesEncontrados = [];
     
+    if(verM10 && CACHE.m10){
+        selectParadas(CACHE.m10,"M-10", origen, destino, viajesEncontrados);
+    }
 
-    /*fetch(urlApi)
-        .then(res => res.json())
-        .then(datos => {
-            console.log(datos);
-            const plan = datos.planificadores[0];
-            const sentido = plan.horarioIda;
-            const paradas = plan.bloquesIda;
+    if(verM11 && CACHE.m11){
+        selectParadas(CACHE.m11,"M-11", origen, destino, viajesEncontrados);
+    }
 
-            const tabla = document.getElementById("tabla-resultados");
-            tabla.innerHTML="";
+    viajesEncontrados.sort((a, b) => a.salida.localeCompare(b.salida));
 
-            let tablaHtml = "<tr>";
-            paradas.forEach(viaje => {
-                console.log(viaje.nombre);
-                tablaHtml += "<th>" + viaje.nombre + "</th>";
-                
-            });
-            
-            
-            tablaHtml += "</tr>";
+    let tablaHtml = "<tr><th>Linea</th><th>Salida</th><th>Hospital</th><th>Llegada</th><th>Frecuencia</th>";
 
-            sentido.forEach(horario => {
-                console.log(horario.horas);
-                tablaHtml += "<tr>";
-                const horas = horario.horas;
-                horas.forEach(hora =>{
-                    console.log(hora);
-                    tablaHtml += "<td>" + hora + "</td>";
-                });
-                tablaHtml += "</tr>";
+    viajesEncontrados.forEach(horario => {
+        tablaHtml += `<tr>
+            <td>${horario.linea}</td>
+            <td>${horario.salida}</td>
+            <td>${horario.hospital}</td>
+            <td>${horario.llegada}</td>
+            <td>${horario.frecuencia}</td>
+                </tr>`
             });
 
             tabla.innerHTML = tablaHtml;
-        });*/
+
 
     
 }
+
+
 
 
 const hoy = new Date;
@@ -107,7 +147,9 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 actualizar.addEventListener('click', function(){
+    console.log(fchBusq.value);
     consultarHorarios();
+    
 });
 
 cambioRuta.addEventListener('click', function(){
@@ -119,6 +161,8 @@ cambioRuta.addEventListener('click', function(){
 console.log(checkM10.checked);
 console.log(checkM11.checked);
 
-
+fchBusq.addEventListener("change", () => {
+    descargar();
+});
 
 // http://api.ctan.es/v1/Consorcios/2/horarios_lineas?dia=21&lang=ES&linea=2&mes=12
