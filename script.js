@@ -156,6 +156,7 @@ cambioRuta.addEventListener('click', function(){
     const aux = rutaOrigen.value;
     rutaOrigen.value = rutaDestino.value;
     rutaDestino.value = aux;
+    consultarHorarios();
 });
 
 console.log(checkM10.checked);
@@ -165,5 +166,18 @@ fchBusq.addEventListener("change", () => {
     descargar();
 });
 
+horaBusq.addEventListener("change", () => {
+    consultarHorarios();
+});
+
+checkM10.addEventListener("change", () => {
+    consultarHorarios();
+});
+
+
+checkM11.addEventListener("change", () => {
+    consultarHorarios();
+});
 
 // http://api.ctan.es/v1/Consorcios/2/horarios_lineas?dia=21&lang=ES&linea=2&mes=12
+
