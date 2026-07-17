@@ -1,5 +1,8 @@
 //API https://api.ctan.es/doc/#api-Lineas-ObtieneParadasLinea
 
+const esLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" || window.location.protocol === "file:";
+const PROXY = esLocal ? "" : "https://corsproxy.io/?";
+
 let CACHE = {
     m10: null,
     m11: null
@@ -21,29 +24,41 @@ const checkM11 = document.getElementById("checkM11");
 
 
 
-function descargar(){
+async function descargar(){
     const fchSelect = fchBusq.value;
     const parte = fchSelect.split('-');
     const dia = parte[2];
     const mes = parte [1];
+    const error = document.getElementById("msg_error");
+    error.innerHTML="";
 
-    const urlM10 = 'https://corsproxy.io/?http://api.ctan.es/v1/Consorcios/2/horarios_lineas?dia=' + dia + '&lang=ES&linea=2&mes=' + mes;
-    const urlM11 = 'https://corsproxy.io/?http://api.ctan.es/v1/Consorcios/2/horarios_lineas?dia=' + dia + '&lang=ES&linea=3&mes=' + mes;
 
-    Promise.all([
-        fetch(urlM10).then(res => res.json()),
-        fetch(urlM11).then(res => res.json())
-    ])
+    const urlM10 = PROXY + 'http://api.ctan.es/v1/Consorcios/2/horarios_lineas?dia=' + dia + '&lang=ES&linea=2&mes=' + mes;
+    const urlM11 = PROXY + 'http://api.ctan.es/v1/Consorcios/2/horarios_lineas?dia=' + dia + '&lang=ES&linea=3&mes=' + mes;
 
-    .then(datos => {
+    try{
+        const datos = await Promise.all([
+            fetch(urlM10).then(res => res.json()),
+            fetch(urlM11).then(res => res.json())
+        ]);
         CACHE.m10 = Array.isArray(datos[0]) ? datos[0][0] : datos[0];
-        CACHE.m11 = Array.isArray(datos[1]) ? datos[1][0] : datos[1]; 
-        console.log(CACHE.m10);
-
-        
+        CACHE.m11 = Array.isArray(datos[1]) ? datos[1][0] : datos[1];
         consultarHorarios();
-    });
-
+    }catch(err){
+        console.error(err);
+        error.innerHTML=`
+            <div class="alert alert-danger text-center" role="alert">
+                Error al obtener los datos del servidor.<br>
+                <a href="https://siu.cmtbc.es/es/movil/horarios_lineas_tabla.php?from=1&linea=2" target="_blank" class="alert-link">
+                    Linea M10
+                </a>
+                <br>
+                <a href="https://siu.cmtbc.es/movil/horarios_lineas_tabla.php?linea=3&from=" target="_blank" class="alert-link">
+                    Linea M11
+                </a>
+            </div>
+        `;
+    }
 }
 
 function selectParadas(datosJson, linea, origen, destino, listaGuardada){
@@ -111,7 +126,7 @@ function consultarHorarios(){
 
     viajesEncontrados.sort((a, b) => a.salida.localeCompare(b.salida));
 
-    let tablaHtml = "<tr><th>Linea</th><th>Salida</th><th>Hospital</th><th>Llegada</th><th>Frecuencia</th>";
+    let tablaHtml = "<tr><th>Linea</th><th>Salida</th><th>Hospital</th><th>Llegada</th><th>Frec</th></tr>";
 
     viajesEncontrados.forEach(horario => {
         tablaHtml += `<tr>
