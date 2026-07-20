@@ -49,7 +49,7 @@ function comprobarFestivo(fchComprobar) {
     if (esFestivo) {
         const fchMod = new Date(fchComprobar + 'T00:00:00');
         fchMod.setDate(fchMod.getDate() - fchMod.getDay());
-        return fchMod.toISOString().split('T')[0];
+        return `${String(fchMod.getFullYear())}-${String(fchMod.getMonth()+1).padStart(2, '0')}-${String(fchMod.getDate()).padStart(2, '0')}`;
     }
     return fchComprobar;
 }
@@ -122,8 +122,6 @@ function selectParadas(datosJson, linea, origen, destino, listaGuardada){
     const hFiltro = horaBusq.value;
     const limiteInferior = horasFiltro(hFiltro, -30);
     const limiteSuperior = horasFiltro(hFiltro, 120);
-    console.log(limiteInferior);
-    console.log(limiteSuperior);
     
     horarios.forEach(viaje => {
         const hSalida = viaje.horas[indexS];
