@@ -6,6 +6,7 @@
     <title>Horario M10 HUPM</title>
     <link rel="manifest" href="manifest.json">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Bus HUPM">
@@ -71,8 +72,7 @@
     <script>
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('./sw.js')
-            .then(() => console.log('Service Worker registrado con éxito.'))
-            .catch(err => console.error('Fallo al registrar el SW:', err));
+                .catch(err => console.error('Fallo al registrar el SW:', err));
         }
     </script>
 </body>

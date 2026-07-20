@@ -5,33 +5,62 @@ const PROXY = esLocal ? "" : "https://corsproxy.io/?";
 
 let CACHE = {
     m10: null,
-    m11: null
+    m11: null,
+    festivos: []
 };
 
 let paradasIDA = [];
-let paradasVuetla = [];
+let paradasVuelta = [];
 
 const fchBusq = document.getElementById("dia");
 const horaBusq = document.getElementById("hora");
 const actualizar = document.getElementById("actualizar");
-
 const rutaOrigen = document.getElementById("origen");
 const rutaDestino = document.getElementById("destino");
 const cambioRuta = document.getElementById("cambioRuta");
-
 const checkM10 = document.getElementById("checkM10");
 const checkM11 = document.getElementById("checkM11");
+const tabla = document.getElementById("tabla-resultados");
+const error = document.getElementById("msg_error");
 
+const incicalizarFecha = () => {
+    const hoy = new Date;
+    const dia = String(hoy.getDate()).padStart(2, '0');
+    const mes = String(hoy.getMonth()+1).padStart(2, '0');
+    const anio = String(hoy.getFullYear());
+    
+    fchBusq.value = `${anio}-${mes}-${dia}`;
+    horaBusq.value = String(hoy.getHours()).padStart(2, '0') + ":" + String(hoy.getMinutes()).padStart(2, '0');
+}
 
+async function cargarFestivos() {
+    try{
+        const res = await fetch('./festivos.json');
+        if(res.ok) {
+            CACHE.festivos = await res.json();
+        }
+    }catch(err){
+        console.error("No se puedieron cargar los festivos", err);
+    }
+}
+
+function comprobarFestivo(fchComprobar) {
+    const esFestivo = CACHE.festivos.includes(fchComprobar);
+    if (esFestivo) {
+        const fchMod = new Date(fchComprobar + 'T00:00:00');
+        fchMod.setDate(fchMod.getDate() - fchMod.getDay());
+        return fecha.toISOString().split('T')[0];
+    }
+    return fchComprobar;
+}
 
 async function descargar(){
-    const fchSelect = fchBusq.value;
+    const fchSelect = comprobarFestivo(fchBusq.value);
     const parte = fchSelect.split('-');
     const dia = parte[2];
     const mes = parte [1];
-    const error = document.getElementById("msg_error");
+    
     error.innerHTML="";
-
 
     const urlM10 = PROXY + 'http://api.ctan.es/v1/Consorcios/2/horarios_lineas?dia=' + dia + '&lang=ES&linea=2&mes=' + mes;
     const urlM11 = PROXY + 'http://api.ctan.es/v1/Consorcios/2/horarios_lineas?dia=' + dia + '&lang=ES&linea=3&mes=' + mes;
@@ -67,7 +96,6 @@ function selectParadas(datosJson, linea, origen, destino, listaGuardada){
     let paradas;
     let horarios;
 
-    
     if(origen==="Cádiz"){
         paradas = plan.bloquesIda;
         horarios = plan.horarioIda;
@@ -83,7 +111,6 @@ function selectParadas(datosJson, linea, origen, destino, listaGuardada){
     let indexI = paradas.findIndex(p => p.nombre === "Hospital-Segunda Ag.");
 
     const hFiltro = horaBusq.value;
-
     
     horarios.forEach(viaje => {
         const hSalida = viaje.horas[indexS];
@@ -105,7 +132,6 @@ function selectParadas(datosJson, linea, origen, destino, listaGuardada){
 
 function consultarHorarios(){
    
-    const tabla = document.getElementById("tabla-resultados");
     tabla.innerHTML="";
     
     let verM10 = checkM10.checked;
@@ -141,27 +167,14 @@ function consultarHorarios(){
     
 }
 
-
-
-
-const hoy = new Date;
-const dia = String(hoy.getDate()).padStart(2, '0');
-const mes = String(hoy.getMonth()+1).padStart(2, '0');
-const anio = String(hoy.getFullYear());
-const hora = String(hoy.getHours()).padStart(2, '0') + ":" + String(hoy.getMinutes()).padStart(2, '0');
-
-document.getElementById("hora").value = hora;
-const fch = anio + "-" + mes + "-" + dia;
-document.getElementById("dia").value = fch;
-
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+    await cargarFestivos();
+    incicalizarFecha();
     descargar();
 });
 
 actualizar.addEventListener('click', function(){
-    console.log(fchBusq.value);
-    consultarHorarios();
-    
+    consultarHorarios();    
 });
 
 cambioRuta.addEventListener('click', function(){
@@ -170,9 +183,6 @@ cambioRuta.addEventListener('click', function(){
     rutaDestino.value = aux;
     consultarHorarios();
 });
-
-console.log(checkM10.checked);
-console.log(checkM11.checked);
 
 fchBusq.addEventListener("change", () => {
     descargar();
@@ -186,10 +196,8 @@ checkM10.addEventListener("change", () => {
     consultarHorarios();
 });
 
-
 checkM11.addEventListener("change", () => {
     consultarHorarios();
 });
 
 // http://api.ctan.es/v1/Consorcios/2/horarios_lineas?dia=21&lang=ES&linea=2&mes=12
-
