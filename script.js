@@ -92,15 +92,14 @@ function selectParadas(datosJson, linea, origen, destino, listaGuardada){
         const frecuencia = viaje.frecuencia;
 
         if(hSalida > hFiltro){
-        
-        listaGuardada.push({
-            linea: linea,
-            salida: hSalida,
-            hospital: hHosp,
-            llegada: hLLegada,
-            frecuencia: frecuencia  
-        });
-    }
+            listaGuardada.push({
+                linea: linea,
+                salida: hSalida,
+                hospital: hHosp,
+                llegada: hLLegada,
+                frecuencia: frecuencia  
+            });
+        }
     });
 }
 
@@ -139,8 +138,6 @@ function consultarHorarios(){
             });
 
             tabla.innerHTML = tablaHtml;
-
-
     
 }
 
