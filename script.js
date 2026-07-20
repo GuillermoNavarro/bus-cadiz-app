@@ -24,7 +24,7 @@ const tabla = document.getElementById("tabla-resultados");
 const error = document.getElementById("msg_error");
 
 const incicalizarFecha = () => {
-    const hoy = new Date;
+    const hoy = new Date();
     const dia = String(hoy.getDate()).padStart(2, '0');
     const mes = String(hoy.getMonth()+1).padStart(2, '0');
     const anio = String(hoy.getFullYear());
@@ -49,7 +49,7 @@ function comprobarFestivo(fchComprobar) {
     if (esFestivo) {
         const fchMod = new Date(fchComprobar + 'T00:00:00');
         fchMod.setDate(fchMod.getDate() - fchMod.getDay());
-        return fecha.toISOString().split('T')[0];
+        return fchMod.toISOString().split('T')[0];
     }
     return fchComprobar;
 }
@@ -90,6 +90,15 @@ async function descargar(){
     }
 }
 
+const horasFiltro = (hora, suma) => {
+    const partes = hora.split(":").map(Number);
+    const fict = new Date();
+    fict.setHours(partes[0]);
+    fict.setMinutes(partes[1] + suma);
+    
+    return String(fict.getHours()).padStart(2, '0') + ":" + String(fict.getMinutes()).padStart(2, '0');
+}
+
 function selectParadas(datosJson, linea, origen, destino, listaGuardada){
     const hospital = "Hospital-Segunda Ag.";
     const plan = datosJson.planificadores[0];
@@ -111,6 +120,10 @@ function selectParadas(datosJson, linea, origen, destino, listaGuardada){
     let indexI = paradas.findIndex(p => p.nombre === "Hospital-Segunda Ag.");
 
     const hFiltro = horaBusq.value;
+    const limiteInferior = horasFiltro(hFiltro, -30);
+    const limiteSuperior = horasFiltro(hFiltro, 120);
+    console.log(limiteInferior);
+    console.log(limiteSuperior);
     
     horarios.forEach(viaje => {
         const hSalida = viaje.horas[indexS];
@@ -118,7 +131,7 @@ function selectParadas(datosJson, linea, origen, destino, listaGuardada){
         const hLLegada = viaje.horas[indexF];
         const frecuencia = viaje.frecuencia;
 
-        if(hSalida > hFiltro){
+        if(limiteInferior <= hSalida && hSalida <= limiteSuperior){
             listaGuardada.push({
                 linea: linea,
                 salida: hSalida,
