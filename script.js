@@ -91,12 +91,13 @@ async function descargar(){
 }
 
 const horasFiltro = (hora, suma) => {
-    const partes = hora.split(":").map(Number);
-    const fict = new Date();
-    fict.setHours(partes[0]);
-    fict.setMinutes(partes[1] + suma);
-    
-    return String(fict.getHours()).padStart(2, '0') + ":" + String(fict.getMinutes()).padStart(2, '0');
+    const [h, m] = hora.split(":").map(Number);
+    return (h * 60) + m + suma; 
+}
+
+const horasMinutos = (hora) => {
+    const [h, m] = hora.split(":").map(Number);
+    return (h * 60) + m; 
 }
 
 function selectParadas(datosJson, linea, origen, destino, listaGuardada){
@@ -122,20 +123,25 @@ function selectParadas(datosJson, linea, origen, destino, listaGuardada){
     const hFiltro = horaBusq.value;
     const limiteInferior = horasFiltro(hFiltro, -30);
     const limiteSuperior = horasFiltro(hFiltro, 120);
-    
+
     horarios.forEach(viaje => {
         const hSalida = viaje.horas[indexS];
         const hHosp = viaje.horas[indexI];
         const hLLegada = viaje.horas[indexF];
         const frecuencia = viaje.frecuencia;
-
-        if(limiteInferior <= hSalida && hSalida <= limiteSuperior){
+        let minSalida = horasMinutos(hSalida);
+        let coincide = false;
+        if(minSalida < limiteInferior && limiteSuperior >= 1440){
+            minSalida += 1440;
+        }
+        if(limiteInferior <= minSalida && minSalida <= limiteSuperior){
             listaGuardada.push({
                 linea: linea,
                 salida: hSalida,
                 hospital: hHosp,
                 llegada: hLLegada,
-                frecuencia: frecuencia  
+                frecuencia: frecuencia,
+                orden: minSalida  
             });
         }
     });
@@ -160,7 +166,8 @@ function consultarHorarios(){
         selectParadas(CACHE.m11,"M-11", origen, destino, viajesEncontrados);
     }
 
-    viajesEncontrados.sort((a, b) => a.salida.localeCompare(b.salida));
+    //viajesEncontrados.sort((a, b) => a.salida.localeCompare(b.salida));
+    viajesEncontrados.sort((a, b) => a.orden - b.orden);
 
     let tablaHtml = "<tr><th>Linea</th><th>Salida</th><th>Hospital</th><th>Llegada</th><th>Frec</th></tr>";
 
@@ -185,7 +192,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 actualizar.addEventListener('click', function(){
-    consultarHorarios();    
+    //consultarHorarios();
+    incicalizarFecha();
+    descargar()    
 });
 
 cambioRuta.addEventListener('click', function(){
