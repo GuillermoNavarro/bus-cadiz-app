@@ -1,0 +1,5 @@
+[[redirects]]
+  from = "/api-bus/*"
+  to = "http://api.ctan.es/v1/Consorcios/2/:splat"
+  status = 200
+  force = true
