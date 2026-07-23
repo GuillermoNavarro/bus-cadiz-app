@@ -2,6 +2,7 @@
 
 const esLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" || window.location.protocol === "file:";
 const PROXY = esLocal ? "" : "https://corsproxy.io/?";
+const esNetlify = window.location.hostname.includes("netlify.app");
 
 let CACHE = {
     m10: null,
@@ -61,9 +62,10 @@ async function descargar(){
     const mes = parte [1];
     
     error.innerHTML="";
-
-    const urlM10 = PROXY + 'http://api.ctan.es/v1/Consorcios/2/horarios_lineas?dia=' + dia + '&lang=ES&linea=2&mes=' + mes;
-    const urlM11 = PROXY + 'http://api.ctan.es/v1/Consorcios/2/horarios_lineas?dia=' + dia + '&lang=ES&linea=3&mes=' + mes;
+    
+    const cabecera = esNetlify ? "/api-bus/" : `${PROXY}http://api.ctan.es/v1/Consorcios/2/`;
+    const urlM10 = cabecera + 'horarios_lineas?dia=' + dia + '&lang=ES&linea=2&mes=' + mes;
+    const urlM11 = cabecera + 'horarios_lineas?dia=' + dia + '&lang=ES&linea=3&mes=' + mes;
 
     try{
         const datos = await Promise.all([
