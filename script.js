@@ -7,7 +7,8 @@ const esNetlify = window.location.hostname.includes("netlify.app");
 let CACHE = {
     m10: null,
     m11: null,
-    festivos: []
+    festivos: [],
+    noticias: []
 };
 
 let paradasIDA = [];
@@ -23,6 +24,7 @@ const checkM10 = document.getElementById("checkM10");
 const checkM11 = document.getElementById("checkM11");
 const tabla = document.getElementById("tabla-resultados");
 const error = document.getElementById("msg_error");
+const cardNoticias = document.getElementById("noticias");
 
 const incicalizarFecha = () => {
     const hoy = new Date();
@@ -42,6 +44,17 @@ async function cargarFestivos() {
         }
     }catch(err){
         console.error("No se puedieron cargar los festivos", err);
+    }
+}
+
+async function cargarNoticias(){
+    try{
+        const res = await fetch('./noticias.json');
+        if(res.ok){
+            CACHE.noticias = await res.json();
+        }
+    }catch(err){
+        console.error("No se puedieron cargar las noticias", err);
     }
 }
 
@@ -102,6 +115,34 @@ const horasMinutos = (hora) => {
     return (h * 60) + m; 
 }
 
+function selectNoticias(m10, m11){
+    const mostrarNoticias = CACHE.noticias.filter(n => {
+        const esM10 = m10 && n.ruta.includes('M-10');
+        const esM11 = m11 && n.ruta.includes('M-11');
+
+        return esM10 || esM11;
+    })
+    
+    if(mostrarNoticias.length === 0){
+        cardNoticias.innerHTML = '<li class="text-muted text-center small">No hay avisos para las líneas seleccionadas.</li>';
+        return;
+    }
+
+    cardNoticias.innerHTML = mostrarNoticias.map(n => `
+        <li class="border-bottom pb-2 mb-2">
+           <div class="d-flex justify-content-between align-items-center mb-1">
+            <span class="badge bg-secondary">${n.fecha}</span>
+            </div>
+            <a href="${n.url}" target="_blank" rel="noopener noreferrer" class="text-decoration-none text-dark fw-semibold small d-block">
+            ${n.texto} 
+            </a> 
+        </li>
+    `).join('');
+
+    
+
+}
+
 function selectParadas(datosJson, linea, origen, destino, listaGuardada){
     const hospital = "Hospital-Segunda Ag.";
     const plan = datosJson.planificadores[0];
@@ -149,6 +190,7 @@ function selectParadas(datosJson, linea, origen, destino, listaGuardada){
     });
 }
 
+
 function consultarHorarios(){
    
     tabla.innerHTML="";
@@ -167,6 +209,8 @@ function consultarHorarios(){
     if(verM11 && CACHE.m11){
         selectParadas(CACHE.m11,"M-11", origen, destino, viajesEncontrados);
     }
+
+    selectNoticias(verM10, verM11);
 
     //viajesEncontrados.sort((a, b) => a.salida.localeCompare(b.salida));
     viajesEncontrados.sort((a, b) => a.orden - b.orden);
@@ -189,6 +233,8 @@ function consultarHorarios(){
 
 document.addEventListener("DOMContentLoaded", async () => {
     await cargarFestivos();
+    await cargarNoticias();
+    selectNoticias(checkM10.checked, checkM11.checked);
     incicalizarFecha();
     descargar();
 });
@@ -196,7 +242,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 actualizar.addEventListener('click', function(){
     //consultarHorarios();
     incicalizarFecha();
-    descargar()    
+    descargar()  
+    selectNoticias(checkM10.checked, checkM11.checked);  
 });
 
 cambioRuta.addEventListener('click', function(){
