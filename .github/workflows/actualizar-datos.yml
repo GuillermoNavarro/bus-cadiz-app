@@ -1,0 +1,36 @@
+name: Actualizar Horarios y Noticias
+
+on:
+  schedule:
+    - cron: '0 5 * * *'
+  workflow_dispatch:
+
+jobs:
+  actualizar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del proyecto
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Instalar dependencias del Scraper
+        run: npm install axios cheerio
+
+      - name: Descargar Horarios API
+        run: |
+          curl -s "http://api.ctan.es/v1/Consorcios/2/horarios_lineas?lang=ES&linea=2" > m10-completo.json
+          curl -s "http://api.ctan.es/v1/Consorcios/2/horarios_lineas?lang=ES&linea=3" > m11-completo.json
+
+      - name: Ejecutar Scraper de Noticias
+        run: node scrap-noticias.js
+
+      - name: Guardar cambios si hay novedades
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add .
+          git diff --quiet && git diff --staged --quiet || (git commit -m "chore: datos y noticias actualizadas automáticamente" && git push)
