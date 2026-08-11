@@ -1,11 +1,12 @@
 [
   {
     "id": "1186",
-    "texto": "Horarios de servicios adicionales autobuses metropolitanos con motivo del festival de música Bahía Sound, en San Fernando: 25 de julio y 15 de agosto de 2026",
-    "fecha": "21/07/2026",
+    "texto": "Sábado 15 de agosto: horarios de servicios adicionales de autobuses metropolitanos con motivo del festival de música Bahía Sound en San Fernando en las líneas M-010 y M-120 y refuerzo de horarios en las líneas M-011 y M-031",
+    "fecha": "10/08/2026",
     "url": "https://siu.cmtbc.es/es/movil/noticia.php?id=1186",
     "ruta": [
-      "M-10"
+      "M-10",
+      "M-11"
     ]
   },
   {
