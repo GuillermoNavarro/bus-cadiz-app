@@ -6,6 +6,7 @@
     <title>Horario M10 HUPM</title>
     <link rel="manifest" href="manifest.json">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -30,7 +31,7 @@
                     
                     <div class="input-group mb-3">
                         <input id="origen" class="form-control text-center" type="text" value="San Fernando" readonly>
-                        <button id="cambioRuta" class="btn btn-primary px-3" type="button">⇄</button>
+                        <button id="cambioRuta" class="btn btn-primary px-3" type="button"><i class="bi bi-arrow-repeat"></i></button>
                         <input id="destino" class="form-control text-center" type="text" value="Cádiz" readonly>
                     </div>
 
@@ -53,8 +54,15 @@
                             <label for="hora" class="form-label small text-muted mb-1">Hora:</label>
                             <input type="time" id="hora" class="form-control">
                         </div>
-                        <div class="col-4">
-                            <button id="actualizar" class="btn btn-outline-secondary w-100">Resetear</button>
+                        <div class="col-2">
+                            <button id="actualizar" type="button" class="btn btn-outline-secondary w-100" title="Resetear fecha y hora" aria-label="Resetear fecha y hora">
+                                <i class="bi bi-arrow-counterclockwise"></i>
+                            </button>
+                        </div>
+                        <div class="col-2">
+                            <button id="btnQr" type="button" class="btn btn-outline-secondary w-100" title="Compartir con QR" aria-label="Compartir con QR" data-bs-toggle="modal" data-bs-target="#modalQR">
+                                <i class="bi bi-qr-code"></i>
+                            </button>
                         </div>
                     </div>
 
@@ -72,6 +80,25 @@
             </div>
         </div>
     </div> 
+
+    <div class="modal fade" id="modalQR" tabindex="-1" aria-labelledby="modalQRLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="modalQRLabel">Compartir web</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <p class="text-muted small">Escanea para compartir los horarios</p>
+                    <img src="qr-code.png" alt="Codigo QR compartir web" class="img-fluid rounded" style="max-width: 220px;"> 
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="script.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
 
