@@ -2,7 +2,7 @@ name: Actualizar Horarios y Noticias
 
 on:
   schedule:
-    - cron: '0 5 * * *'
+    - cron: '19 2 * * *'
   workflow_dispatch:
 
 jobs:
